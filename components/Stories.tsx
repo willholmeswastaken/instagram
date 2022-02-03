@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 import faker from '@faker-js/faker'
 import Story from './Story'
 
@@ -22,7 +22,7 @@ interface Story {
   }
   website: string
 }
-const Stories = () => {
+const Stories: FunctionComponent = () => {
   const [suggestions, setSuggestions] = useState<Array<Story>>([])
   useEffect(() => {
     const suggestions = [...Array(20)].map((_, i) => ({

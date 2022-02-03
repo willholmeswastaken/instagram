@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 
 interface StoryProps {
   img: string
   username: string
 }
 
-const Story = ({ img, username }: StoryProps) => {
+const Story: FunctionComponent<StoryProps> = ({ img, username }) => {
   return (
     <div>
       <img

@@ -1,3 +1,4 @@
+import { FunctionComponent } from 'react'
 import Image from 'next/image'
 import {
   SearchIcon,
@@ -9,7 +10,7 @@ import {
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
 
-const Header = () => {
+const Header: FunctionComponent = () => {
   return (
     <div className='shadow-sm border-b bg-white sticky top-0 z-50'>
       <div className="mx-5 flex max-w-6xl justify-between lg:mx-auto">

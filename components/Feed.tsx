@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
+import Posts from './Posts'
 import Stories from './Stories'
 
-const Feed = () => {
+const Feed: FunctionComponent = () => {
   return (
     <main className="grid max-w-3xl grid-cols-1 md:mx-auto md:grid-cols-2 xl:max-w-6xl xl:grid-cols-3">
       <section className="col-span-2">
         <Stories />
-        {/* Posts */}
+        <Posts />
       </section>
 
       <section>
