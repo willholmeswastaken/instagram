@@ -10,20 +10,28 @@ import {
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
 import { signIn, signOut, useSession } from 'next-auth/react'
+import { NextRouter, useRouter } from 'next/router'
 
 const Header: FunctionComponent = () => {
   const { data: session } = useSession()
+  const router: NextRouter = useRouter()
   return (
     <div className="sticky top-0 z-50 border-b bg-white shadow-sm">
       <div className="mx-5 flex max-w-6xl justify-between lg:mx-auto">
-        <div className="relative hidden w-24 cursor-pointer lg:inline-grid">
+        <div
+          className="relative hidden w-24 cursor-pointer lg:inline-grid"
+          onClick={() => router.push('/')}
+        >
           <Image
             src="https://links.papareact.com/ocw"
             layout="fill"
             objectFit="contain"
           />
         </div>
-        <div className="relative w-10 flex-shrink-0 cursor-pointer lg:hidden">
+        <div
+          className="relative w-10 flex-shrink-0 cursor-pointer lg:hidden"
+          onClick={() => router.push('/')}
+        >
           <Image
             src="https://links.papareact.com/jjm"
             layout="fill"
@@ -45,7 +53,7 @@ const Header: FunctionComponent = () => {
         </div>
 
         <div className="flex items-center justify-end space-x-4">
-          <HomeIcon className="navButton" />
+          <HomeIcon className="navButton" onClick={() => router.push('/')} />
           <MenuIcon className="h-6 cursor-pointer md:hidden" />
           {session ? (
             <>
@@ -62,7 +70,7 @@ const Header: FunctionComponent = () => {
                 onClick={() => signOut()}
                 src={session?.user?.image || ''}
                 alt="Profile picture"
-                className="h-10 w-10 rounded-full cursor-pointer"
+                className="h-10 w-10 cursor-pointer rounded-full"
               />
             </>
           ) : (

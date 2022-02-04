@@ -1,18 +1,25 @@
 import React, { FunctionComponent } from 'react'
+import { signOut, useSession } from 'next-auth/react'
 
 const MiniProfile: FunctionComponent = () => {
+  const { data: session } = useSession()
   return (
     <div className="mt-14 ml-10 flex items-center justify-between">
       <img
         className="h-16 w-16 rounded-full border p-[2px]"
-        src="https://res.cloudinary.com/practicaldev/image/fetch/s--XWtgdZei--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/539842/cd0a3b2a-7787-4dc9-8842-3a4781a8369b.jpg"
+        src={session?.user?.image || ""}
         alt="Mini profile picture"
       />
-      <div className='flex-1 mx-4'>
-        <h2 className="font-bold">willl.holmes</h2>
+      <div className="mx-4 flex-1">
+        <h2 className="font-bold">{session?.user?.name}</h2>
         <h3 className="text-sm text-gray-400">Welcome to Instagram!</h3>
       </div>
-      <button className='text-blue-400 text-sm font-semibold'>Sign out</button>
+      <button
+        className="text-sm font-semibold text-blue-400"
+        onClick={() => signOut()}
+      >
+        Sign out
+      </button>
     </div>
   )
 }
