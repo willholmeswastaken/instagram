@@ -9,10 +9,12 @@ import {
   MenuIcon,
 } from '@heroicons/react/outline'
 import { HomeIcon } from '@heroicons/react/solid'
+import { signIn, signOut, useSession } from 'next-auth/react'
 
 const Header: FunctionComponent = () => {
+  const { data: session } = useSession()
   return (
-    <div className='shadow-sm border-b bg-white sticky top-0 z-50'>
+    <div className="sticky top-0 z-50 border-b bg-white shadow-sm">
       <div className="mx-5 flex max-w-6xl justify-between lg:mx-auto">
         <div className="relative hidden w-24 cursor-pointer lg:inline-grid">
           <Image
@@ -45,20 +47,27 @@ const Header: FunctionComponent = () => {
         <div className="flex items-center justify-end space-x-4">
           <HomeIcon className="navButton" />
           <MenuIcon className="h-6 cursor-pointer md:hidden" />
-          <div className="navButton relative">
-            <PaperAirplaneIcon className="navButton rotate-45" />
-            <div className="absolute -top-1 -right-2 flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-red-500 text-xs text-white">
-              3
-            </div>
-          </div>
-          <PlusCircleIcon className="navButton" />
-          <UserGroupIcon className="navButton" />
-          <HeartIcon className="navButton" />
-          <img
-            src="https://res.cloudinary.com/practicaldev/image/fetch/s--XWtgdZei--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/539842/cd0a3b2a-7787-4dc9-8842-3a4781a8369b.jpg"
-            alt="Profile picture"
-            className="h-10 rounded-full"
-          />
+          {session ? (
+            <>
+              <div className="navButton relative">
+                <PaperAirplaneIcon className="navButton rotate-45" />
+                <div className="absolute -top-1 -right-2 flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                  3
+                </div>
+              </div>
+              <PlusCircleIcon className="navButton" />
+              <UserGroupIcon className="navButton" />
+              <HeartIcon className="navButton" />
+              <img
+                onClick={() => signOut()}
+                src={session?.user?.image || ''}
+                alt="Profile picture"
+                className="h-10 w-10 rounded-full cursor-pointer"
+              />
+            </>
+          ) : (
+            <button onClick={() => signIn()}>Sign In</button>
+          )}
         </div>
       </div>
     </div>
