@@ -1,14 +1,56 @@
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { modalState } from '../atoms/modalAtom'
 import { Dialog, Transition } from '@headlessui/react'
 import { CameraIcon } from '@heroicons/react/outline'
+import { db, storage } from '../firebase'
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore'
+import { useSession } from 'next-auth/react'
+import { ref, getDownloadURL, uploadString } from 'firebase/storage'
 
 const Modal = () => {
+  const { data: session } = useSession()
   const [openModal, setOpenModal] = useRecoilState(modalState)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const captionRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState<boolean>(false)
+  const captionRef = useRef<HTMLInputElement>(null)
   const filePickerRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setLoading(false)
+    setSelectedFile(null)
+  }, [openModal])
+
+  const upload = async () => {
+    if (loading) return
+
+    setLoading(true)
+    const docRef = await addDoc(collection(db, 'posts'), {
+      username: session?.user?.name,
+      caption: captionRef?.current?.value,
+      profileImage: session?.user?.image,
+      timestamp: serverTimestamp(),
+    })
+
+    console.log('New doc added with id', docRef.id)
+    const imageReference = ref(storage, `posts/${docRef.id}/image`)
+
+    await uploadString(imageReference, selectedFile!, 'data_url')
+    
+    const downloadUrl = await getDownloadURL(imageReference)
+    await updateDoc(doc(db, 'posts', docRef.id), {
+      image: downloadUrl,
+    })
+
+    setOpenModal(false)
+  }
+
   const addImageToPost = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
 
@@ -99,7 +141,7 @@ const Modal = () => {
                         ref={filePickerRef}
                         type="file"
                         hidden
-                        onChange={e => addImageToPost(e)}
+                        onChange={(e) => addImageToPost(e)}
                       />
                     </div>
                     <div className="mt-2">
@@ -115,9 +157,13 @@ const Modal = () => {
                 <div className="mt-5 sm:mt-6">
                   <button
                     type="button"
-                    className="border-trasparent inline-flex w-full justify-center rounded-md border bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-300 hover:disabled:bg-gray-300 sm:text-sm"
+                    disabled={loading}
+                    className="border-trasparent inline-flex w-full justify-center rounded-md border bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm
+                     hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-300
+                      hover:disabled:bg-gray-300 sm:text-sm"
+                    onClick={() => upload()}
                   >
-                    Upload Post
+                    {loading ? 'Uploading...' : 'Upload Post'}
                   </button>
                 </div>
               </div>
