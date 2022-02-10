@@ -8,6 +8,7 @@ import {
   PaperAirplaneIcon,
 } from '@heroicons/react/outline'
 import { HeartIcon as HeartIconFilled } from '@heroicons/react/solid'
+import { useSession } from 'next-auth/react'
 
 interface PostProps {
   id: string
@@ -24,6 +25,7 @@ const Post: FunctionComponent<PostProps> = ({
   image,
   caption,
 }) => {
+  const { data: session } = useSession()
   return (
     <div className="my-7 rounded-sm border bg-white">
       <div className="flex items-center p-5">
@@ -33,20 +35,21 @@ const Post: FunctionComponent<PostProps> = ({
           alt="User profile image"
         />
         <p className="flex-1 font-bold">{username}</p>
-        <DotsHorizontalIcon className="h-5" />
+        <DotsHorizontalIcon className="h-5 cursor-pointer" />
       </div>
       <img src={image} className="w-full object-cover" alt="Uploaded photo" />
 
-      {/* buttons */}
-      <div className="flex justify-between px-4 pt-4">
-        <div className="flex space-x-4">
-          <HeartIcon className="btn" />
-          <ChatIcon className="btn" />
-          <PaperAirplaneIcon className="btn" />
+      {session && (
+        <div className="flex justify-between px-4 pt-4">
+          <div className="flex space-x-4">
+            <HeartIcon className="btn" />
+            <ChatIcon className="btn" />
+            <PaperAirplaneIcon className="btn" />
+          </div>
+          <BookmarkIcon className="btn" />
         </div>
-        <BookmarkIcon className="btn" />
-      </div>
-      {/* caption */}
+      )}
+      
       <p className="truncate p-5">
         {/* TODO: add the show more on captions */}
         <span className="mr-1 font-bold">{username} </span>
@@ -54,12 +57,17 @@ const Post: FunctionComponent<PostProps> = ({
       </p>
       {/* comments */}
 
-      {/* input box */}
-      <form className="flex items-center p-4" action="">
-        <EmojiHappyIcon className="h-7" />
-        <input type="text" placeholder="Add a comment..." className="border-none flex-1 focus:ring-0" />
-        <button className="font-semibold text-blue-400">Post</button>
-      </form>
+      {session && (
+        <form className="flex items-center p-4" action="">
+          <EmojiHappyIcon className="h-7" />
+          <input
+            type="text"
+            placeholder="Add a comment..."
+            className="flex-1 border-none focus:ring-0"
+          />
+          <button className="font-semibold text-blue-400">Post</button>
+        </form>
+      )}
     </div>
   )
 }

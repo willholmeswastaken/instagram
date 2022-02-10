@@ -1,26 +1,30 @@
-import React, { FunctionComponent } from 'react'
+import { onSnapshot, collection, query, orderBy, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore'
+import React, { FunctionComponent, useEffect, useState } from 'react'
+import { db } from '../firebase'
 import Post from './Post'
 
-const posts = [
-  {
-    id: '123',
-    username: 'willl.holmes',
-    userImage:
-      'https://res.cloudinary.com/practicaldev/image/fetch/s--XWtgdZei--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/539842/cd0a3b2a-7787-4dc9-8842-3a4781a8369b.jpg',
-    img: 'https://res.cloudinary.com/practicaldev/image/fetch/s--XWtgdZei--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/539842/cd0a3b2a-7787-4dc9-8842-3a4781a8369b.jpg',
-    caption: 'This is awesome!',
-  },
-  {
-    id: '213',
-    username: 'willl.holmes',
-    userImage:
-      'https://res.cloudinary.com/practicaldev/image/fetch/s--XWtgdZei--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/539842/cd0a3b2a-7787-4dc9-8842-3a4781a8369b.jpg',
-    img: 'https://res.cloudinary.com/practicaldev/image/fetch/s--XWtgdZei--/c_fill,f_auto,fl_progressive,h_320,q_auto,w_320/https://dev-to-uploads.s3.amazonaws.com/uploads/user/profile_image/539842/cd0a3b2a-7787-4dc9-8842-3a4781a8369b.jpg',
-    caption: 'This is awesome!',
-  },
-]
+interface Post {
+  id: string;
+  image: string;
+  caption: string;
+  profileImage: string;
+  username: string;
+}
 
 const Posts: FunctionComponent = () => {
+  const [posts, setPosts] = useState<Post[]>([])
+
+  useEffect(
+    () =>
+      onSnapshot(
+        query(collection(db, 'posts'), orderBy('timestamp', 'desc')),
+        (snapshot) => {
+          setPosts(snapshot.docs.filter(x => (x.data() as Post).image !== undefined).map(x => x.data() as Post))
+        }
+      ),
+    [db]
+  )
+  
   return (
     <div>
       {posts.map((post) => (
@@ -28,17 +32,11 @@ const Posts: FunctionComponent = () => {
           id={post.id}
           key={post.id}
           username={post.username}
-          userImage={post.userImage}
-          image={post.img}
+          userImage={post.profileImage}
+          image={post.image}
           caption={post.caption}
         />
       ))}
-      {/* Post */}
-      {/* Post */}
-      {/* Post */}
-      {/* Post */}
-      {/* Post */}
-      {/* Post */}
     </div>
   )
 }
