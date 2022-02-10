@@ -1,4 +1,4 @@
-import { onSnapshot, collection, query, orderBy, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore'
+import { onSnapshot, collection, query, orderBy } from 'firebase/firestore'
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import { db } from '../firebase'
 import Post from './Post'
@@ -24,7 +24,7 @@ const Posts: FunctionComponent = () => {
       ),
     [db]
   )
-  
+
   return (
     <div>
       {posts.map((post) => (
