@@ -19,7 +19,10 @@ const Posts: FunctionComponent = () => {
       onSnapshot(
         query(collection(db, 'posts'), orderBy('timestamp', 'desc')),
         (snapshot) => {
-          setPosts(snapshot.docs.filter(x => (x.data() as Post).image !== undefined).map(x => x.data() as Post))
+          setPosts(snapshot.docs.filter(x => (x.data() as Post).image !== undefined).map(x => ({
+            ...x.data(),
+            id: x.id
+          } as Post)))
         }
       ),
     [db]

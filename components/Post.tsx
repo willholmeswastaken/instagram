@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 import {
   BookmarkIcon,
   ChatIcon,
@@ -9,6 +9,17 @@ import {
 } from '@heroicons/react/outline'
 import { HeartIcon as HeartIconFilled } from '@heroicons/react/solid'
 import { useSession } from 'next-auth/react'
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  Timestamp,
+} from 'firebase/firestore'
+import { db } from '../firebase'
+import Moment from 'react-moment'
 
 interface PostProps {
   id: string
@@ -16,6 +27,14 @@ interface PostProps {
   userImage: string
   image: string
   caption: string
+}
+
+interface Comment {
+  id: string;
+  comment: string
+  username: string
+  userImage: string;
+  timestamp: Timestamp;
 }
 
 const Post: FunctionComponent<PostProps> = ({
@@ -26,6 +45,38 @@ const Post: FunctionComponent<PostProps> = ({
   caption,
 }) => {
   const { data: session } = useSession()
+  const [currentComment, setCurrentComment] = useState<string>('')
+  const [comments, setComments] = useState<Array<Comment>>([])
+  const commentButtonDisabled = !currentComment.trim()
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, 'posts', id, 'comments'),
+          orderBy('timestamp', 'desc')
+        ),
+        (snapshot) => setComments(snapshot.docs.map((x) => ({
+          id: x.id,
+          ...x.data()
+        } as Comment)))
+      ),
+    [db]
+  )
+
+
+  const sendComment = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+
+    const commentToSend = currentComment
+    setCurrentComment('')
+
+    await addDoc(collection(db, 'posts', id, 'comments'), {
+      comment: commentToSend,
+      username: session?.user?.name,
+      userImage: session?.user?.image,
+      timestamp: serverTimestamp(),
+    })
+  }
   return (
     <div className="my-7 rounded-sm border bg-white">
       <div className="flex items-center p-5">
@@ -49,13 +100,30 @@ const Post: FunctionComponent<PostProps> = ({
           <BookmarkIcon className="btn" />
         </div>
       )}
-      
+
       <p className="truncate p-5">
         {/* TODO: add the show more on captions */}
         <span className="mr-1 font-bold">{username} </span>
         {caption}
       </p>
       {/* comments */}
+        {comments.length > 0 && (
+          <div className='ml-10 h-20 overflow-y-scroll scrollbar-thumb-black scrollbar-thin'>
+            {comments.map(x => (
+              <div key={x.id} className='flex items-center space-x-2 mb-3'>
+                <img src={x.userImage} alt="posted users image" className='h-7 rounded-full' />
+                <p className="text-sm flex-1">
+                  <span className="font-bold">{x.username} </span>
+                  {x.comment}
+                </p>
+                <Moment fromNow className="pr-5 text-xs">
+                  {x.timestamp.toDate()}
+                </Moment>
+              </div>
+            ))}
+          </div>
+        )}
+
 
       {session && (
         <form className="flex items-center p-4" action="">
@@ -63,9 +131,22 @@ const Post: FunctionComponent<PostProps> = ({
           <input
             type="text"
             placeholder="Add a comment..."
+            value={currentComment}
+            onChange={(e) => setCurrentComment(e.target.value)}
             className="flex-1 border-none focus:ring-0"
           />
-          <button className="font-semibold text-blue-400">Post</button>
+          <button
+            type="submit"
+            disabled={commentButtonDisabled}
+            onClick={(e) => sendComment(e)}
+            className={`font-semibold  ${
+              !commentButtonDisabled
+                ? 'cursor-pointer text-blue-400'
+                : 'text-gray-400'
+            }`}
+          >
+            Post
+          </button>
         </form>
       )}
     </div>
