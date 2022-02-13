@@ -179,7 +179,7 @@ const Post: FunctionComponent<PostProps> = ({
                 {x.comment}
               </p>
               <Moment fromNow className="pr-5 text-xs">
-                {x.timestamp.toDate()}
+                {x.timestamp?.toDate()}
               </Moment>
             </div>
           ))}
