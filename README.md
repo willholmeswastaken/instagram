@@ -1,4 +1,5 @@
 # Instagram clone
+Live demo: https://instagram-seven-iota.vercel.app/
 I made this to experiment with tailwind, firebase and nextjs.
 
 It includes:
