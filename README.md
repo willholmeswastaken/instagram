@@ -1,7 +1,11 @@
 # Instagram clone
 Live demo: https://instagram-seven-iota.vercel.app/
 
-I made this to experiment with tailwind, firebase and nextjs.
+Tech Stack:
+- NextJS
+- TailwindCss
+- Firebase
+- Recoil
 
 It includes:
 - Login with google
